@@ -28,6 +28,10 @@ jobs:
          git add .
          git status
          git branch
+         git config  user.name 'Jawad Saleem'
+         git config  user.email 'jawad.saleem@core10.io'
+         git commit -am "Helm values updated"
+         git push  
 
 
     
