@@ -43,6 +43,7 @@ jobs:
             echo "changes=false" >> $GITHUB_ENV
           fi
       - name: Print env
+        if: env.changes == 'true'
         run: printenv
 
 
