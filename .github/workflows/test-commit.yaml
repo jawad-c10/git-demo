@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - develop  # Change this to the branch you want to trigger the workflow on
+      - feature*
 
 jobs:
 
@@ -13,25 +14,26 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       
-      - name: Deploy to Dev
+      
+      - name: Determine changes for deployment
+        id: changes
         run: |
-          ls
-          pwd
-          SEMVERTAG=123
-          cat values.yaml 
-          sed -i -e 's/__IMAGETAG__/'"$SEMVERTAG"'/g' values.yaml 
-          cat values.yaml 
-      - name: Auto Commit
-        run: |
-        
-         git status
-         git add .
-         git status
-         git branch
-         git config  user.name 'Jawad Saleem'
-         git config  user.email 'jawad.saleem@core10.io'
-         git commit -am "Helm values updated"
-         git push  
+          # Get the current SHA and base SHA for the PR
+          BASE_SHA=${{ github.event.before }}
+          CURRENT_SHA=${{ github.sha }}
+
+          # Print the SHAs to the console
+          echo "Base SHA: $BASE_SHA"
+          echo "Current SHA: $CURRENT_SHA"
+
+          # Check for changes in packages
+          if git diff --name-only $BASE_SHA $CURRENT_SHA | grep -q "^packages/${{ matrix.service }}/"; then
+            echo "changes=true" >> $GITHUB_ENV
+          else
+            echo "changes=false" >> $GITHUB_ENV
+          fi
+      - name: Print env
+        run: printenv
 
 
     
